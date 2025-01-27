@@ -15,7 +15,6 @@ import { router, useLocalSearchParams } from "expo-router";
 import icons from "@/constants/icons";
 import images from "@/constants/images";
 import Comment from "@/components/Comment";
-import { facilities } from "@/constants/data";
 
 import { useMemo } from "react";
 import { getProperties, useCRMRE, Property } from "@/lib/crmre";
@@ -27,7 +26,6 @@ const PropertyDetails = () => {
   const { id } = useLocalSearchParams<{ id?: string }>();
   const windowHeight = Dimensions.get("window").height;
 
-  // Memoize params to avoid re-rendering issues
   const params = useMemo(() => ({ endpoint: `units/${id}` as `units/${number}` }), [id]);
 
   const { data, loading, error } = useCRMRE<Property, typeof params>({
@@ -57,8 +55,36 @@ const PropertyDetails = () => {
   }
 
   const agent = Array.isArray(property.agent) ? property.agent[0] : {};
-  const cover = property.gallery?.cover || property.property?.gallery?.cover;
   const gallery = property.gallery?.images || null;
+
+  const getImageUri = (
+    gallery?: Property['gallery'],
+    property?: Property['property']
+  ): string => {
+    return (
+      gallery?.cover ||
+      gallery?.images?.[0] ||
+      property?.gallery?.cover ||
+      null
+    );
+  };
+
+  const coverUri = getImageUri(property.gallery, property.property);
+
+
+  interface ImageWrapperProps {
+    uri: string | null;
+    fallback: any; // Fallback image source
+    className: string;
+  }
+
+  const ImageWrapper = ({ uri, fallback, className }: ImageWrapperProps) => {
+    return uri ? (
+      <Image source={{ uri }} className={className} />
+    ) : (
+      <Image source={fallback} className={className} />
+    );
+  };
 
   return (
     <View>
@@ -71,10 +97,10 @@ const PropertyDetails = () => {
           {property?.gallery?.images?.length > 0 ? (
             <Carrousel images={property?.gallery?.images} />
           ) : (
-            <Image
-              source={{ uri: cover }}
-              className="size-full"
-              resizeMode="cover"
+            <ImageWrapper
+              uri={coverUri}
+              fallback={images.iconRE}
+              className="size-full rounded-2xl"
             />
           )}
 
