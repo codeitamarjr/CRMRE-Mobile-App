@@ -7,6 +7,7 @@ import icons from '../constants/icons'
 import { login } from '@/lib/appwrite'
 import { useGlobalContext } from '@/lib/global-provide'
 import { Redirect } from 'expo-router'
+import InfinityScrollScreen from '@/components/InfinityScrollScreen'
 
 const SignIn = () => {
   const { refetch, loading, isLoggedIn } = useGlobalContext();
@@ -23,10 +24,23 @@ const SignIn = () => {
     }
   };
 
+  const images = [
+    "https://cdn.crmre.realenquiries.com/production/mdpm/attachments/properties/2/w0rws7vgIYuEMhRJXdJobeIHh1O94g5NETH5JAET.png",
+    "https://havenhomes.ie/wp-content/uploads/2024/07/20-Elgin-Road-3.png",
+    "https://balroyhalldublin.ie/wp-content/uploads/2024/08/Balroy_38-4604-1.jpg",
+    "https://havenhomes.ie/wp-content/uploads/2021/08/174b.png",
+    "https://havenhomes.ie/wp-content/uploads/2022/08/138-Rathgar-Rd-4.png",
+    "https://balroyhalldublin.ie/wp-content/uploads/2024/08/untitled-5266-1.jpg",
+    "https://balroyhalldublin.ie/wp-content/uploads/2024/08/Group-120.jpg",
+    "https://havenhomes.ie/wp-content/uploads/2024/07/20-Elgin-Road-2.png",
+    "https://balroyhalldublin.ie/wp-content/uploads/2024/08/Balroy-0699-1.jpg",
+  ];
+
   return (
     <SafeAreaView className='bg-white h-full'>
       <ScrollView>
-        <Image source={require('../assets/images/icon.png')} className='size-40 my-40 mx-auto' resizeMode='contain' />
+      <InfinityScrollScreen data={images} />
+      {/* <Image source={require('../assets/images/icon.png')} className='size-40 my-40 mx-auto' resizeMode='contain' /> */}
         <View className='px-10'>
           <Text className='text-base text-center uppercase text-black-200 font-rubik my-5'>Real Enquiries Marketplace</Text>
           <Text className='text-3xl font-rubik-bold text-black-300 text-center mt-2'>
