@@ -45,6 +45,7 @@ export interface Property {
     latitude: number;
     longitude: number;
   };
+  views?: number;
 }
 
 export async function getProperties({

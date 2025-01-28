@@ -27,9 +27,20 @@ const RatingBadge = () => (
     </View>
 );
 
+const ViewsBadge = ({ number }: { number: number }) => (
+    <View className="flex flex-row items-center bg-white/90 px-3 py-1.5 rounded-full absolute top-5 right-5">
+        <Image source={icons.view} className="size-3.5" />
+        <Text className="text-xs font-rubik-bold text-primary-300 ml-1">{number?.toLocaleString() || '0'}</Text>
+    </View>
+);
+
 // Reusable Favorite Icon Component
-const FavoriteIcon = () => (
-    <Image source={icons.heart} className="size-5" tintColor="#191d31" />
+interface FavoriteIconProps {
+    tintColor?: string;
+}
+
+const FavoriteIcon = ({ tintColor }: FavoriteIconProps) => (
+    <Image source={icons.heart} className="size-5" style={{ tintColor }} />
 );
 
 export const FeaturedCard = ({ item: { gallery, address, rate, city, property }, onPress }: Props) => {
@@ -44,7 +55,7 @@ export const FeaturedCard = ({ item: { gallery, address, rate, city, property },
             )}
 
             <Image source={images.cardGradient} className='size-full rounded-2xl absolute bottom-0' />
-            <RatingBadge />
+            <ViewsBadge number={5} />
 
             <View className='flex flex-col items-start absolute bottom-5 inset-x-5'>
                 <Text className='text-xl font-rubik-extra-bold text-white' numberOfLines={1}>{city}</Text>
@@ -57,7 +68,7 @@ export const FeaturedCard = ({ item: { gallery, address, rate, city, property },
                     <Text className='text-xl font-rubik-extra-bold text-white'>
                         {rate}
                     </Text>
-                    <Image source={icons.heart} className='size-5' />
+                    <FavoriteIcon />
                 </View>
             </View>
         </TouchableOpacity>
@@ -70,9 +81,10 @@ export const RegularCard = ({ item: { gallery, address, rate, type, number, prop
     return (
         <TouchableOpacity onPress={onPress} className='flex-1 w-full mt-4 px-3 py-4 rounded-lg bg-white shadow-lg shadow-black-100/70 relative'>
             <View className='flex flex-row items-center absolute px-2 top-5 right-5 bg-white/90 p-1 rounded-full z-50'>
-                <Image source={icons.star} className='size-2.5' />
+                <Image source={icons.view} className='size-2.5' />
                 <Text className='text-xs font-rubik-bold text-primary-300 ml-0.5'>5</Text>
             </View>
+            
 
             {imageUri ? (
                 <Image source={{ uri: imageUri }} className='w-full h-40 rounded-lg' />
@@ -89,7 +101,7 @@ export const RegularCard = ({ item: { gallery, address, rate, type, number, prop
                     <Text className='text-base font-rubik-bold text-primary-300'>
                         {rate}
                     </Text>
-                    <Image source={icons.heart} className='size-5 mr-2' tintColor="#191d31" />
+                    <FavoriteIcon tintColor="#191d31" />
                 </View>
             </View>
         </TouchableOpacity>
