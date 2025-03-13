@@ -26,14 +26,14 @@ const PropertyDetails = () => {
   const { id } = useLocalSearchParams<{ id?: string }>();
   const windowHeight = Dimensions.get("window").height;
 
-  const params = useMemo(() => ({ endpoint: `units/${id}` as `units/${number}` }), [id]);
+  const params = useMemo(() => ({ id: Number(id) }), [id]);
 
   const { data, loading, error } = useCRMRE<Property, typeof params>({
     fn: getProperties,
     params,
   });
 
-  const property = data || null;
+  const property = data && !Array.isArray(data) ? data : null;
 
   if (loading) {
     return (
@@ -98,7 +98,7 @@ const PropertyDetails = () => {
             <Carrousel images={property?.gallery?.images} />
           ) : (
             <ImageWrapper
-              uri={coverUri}
+              uri={coverUri ?? ''}
               fallback={images.iconRE}
               className="size-full rounded-2xl"
             />

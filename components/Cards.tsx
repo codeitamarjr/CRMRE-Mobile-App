@@ -84,7 +84,7 @@ export const RegularCard = ({ item: { gallery, address, rate, type, number, prop
                 <Image source={icons.view} className='size-2.5' />
                 <Text className='text-xs font-rubik-bold text-primary-300 ml-0.5'>5</Text>
             </View>
-            
+
 
             {imageUri ? (
                 <Image source={{ uri: imageUri }} className='w-full h-40 rounded-lg' />

@@ -17,7 +17,7 @@ export interface Property {
     cover: string;
     images: string[];
   };
-  property:{
+  property: {
     name: string;
     address: string;
     city: string;
@@ -49,52 +49,40 @@ export interface Property {
 }
 
 export async function getProperties({
-  endpoint = 'units',
   id,
   featured,
   page = 1,
   query,
   limit,
 }: {
-  endpoint?: 'units' | `units/${number}`;
   id?: number;
   featured?: boolean;
   page?: number;
   query?: string;
   limit?: number;
-}): Promise<Property[] | Property> {
+}): Promise<Property | Property[] | null> {
   try {
+    const endpoint = id ? `units/${id}` : "units";
     const url = `https://mdpm.realenquiries.com/api/v1/${endpoint}`;
-    const response = await axios.get<{ data: Property | Record<string, Property> }>(url, {
-      params: {
-        id,
-        featured: featured ? 1 : undefined,
-        query,
-        limit,
-      },
+
+    const response = await axios.get<{ data: Property | Property[] }>(url, {
+      params: { featured: featured ? 1 : undefined, query, limit },
     });
 
     if (!response.data || !response.data.data) {
-      Alert.alert('No properties found');
-      return [];
+      Alert.alert("No property found");
+      return null;
     }
 
-    // Check if `data` is a single object or a record
-    if ('id' in response.data.data) {
-      // Single property
-      return response.data.data as Property;
-    }
-
-    // Multiple properties
-    return Object.values(response.data.data as Record<string, Property>);
+    return response.data.data;
   } catch (error) {
-    console.error(error);
-    return [];
+    console.error("API Error:", error);
+    return null;
   }
 }
 
 interface UseCRMREOptions<T, P extends Record<string, string | number>> {
-  fn: (params: P) => Promise<T>;
+  fn: (params: P) => Promise<T | T[] | null>;
   params?: P;
   skip?: boolean;
   skipAlert?: boolean;

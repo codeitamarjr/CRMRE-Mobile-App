@@ -39,7 +39,7 @@ const SignIn = () => {
   return (
     <SafeAreaView className='bg-white h-full'>
       <ScrollView>
-      <InfinityScrollScreen data={images} />
+      {/* <InfinityScrollScreen data={images} /> */}
       {/* <Image source={require('../assets/images/icon.png')} className='size-40 my-40 mx-auto' resizeMode='contain' /> */}
         <View className='px-10'>
           <Text className='text-base text-center uppercase text-black-200 font-rubik my-5'>Real Enquiries Marketplace</Text>
