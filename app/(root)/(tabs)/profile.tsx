@@ -5,7 +5,6 @@ import icons from '@/constants/icons';
 import images from '@/constants/images';
 import { settings } from '@/constants/data';
 import { useGlobalContext } from '@/lib/global-provide';
-import { logout } from '@/lib/appwrite';
 
 interface SettingsItemProps {
   icon: ImageSourcePropType;

@@ -4,7 +4,6 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 
 import images from '../constants/images'
 import icons from '../constants/icons'
-import { login } from '@/lib/appwrite'
 import { useGlobalContext } from '@/lib/global-provide'
 import { Redirect } from 'expo-router'
 import InfinityScrollScreen from '@/components/InfinityScrollScreen'

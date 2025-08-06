@@ -1,5 +1,4 @@
 import { Property } from '@/lib/crmre';
-import { View, Text, TouchableOpacity, Image } from 'react-native'
 import MapView, { Marker } from 'react-native-maps';
 
 

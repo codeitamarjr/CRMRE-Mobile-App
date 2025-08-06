@@ -71,10 +71,9 @@ const PropertyDetails = () => {
 
   const coverUri = getImageUri(property.gallery, property.property);
 
-
   interface ImageWrapperProps {
     uri: string | null;
-    fallback: any; // Fallback image source
+    fallback: any;
     className: string;
   }
 
