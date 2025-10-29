@@ -1,6 +1,6 @@
 import { View, Text, ScrollView, Image, TouchableOpacity, ImageSourcePropType, Alert } from 'react-native'
 import React from 'react'
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import icons from '@/constants/icons';
 import images from '@/constants/images';
 import { settings } from '@/constants/data';
@@ -26,6 +26,7 @@ const SettingsItem = ({ icon, title, onPress, textStyle, showArrow = true }: Set
 
 const Profile = () => {
   const { user, refetch } = useGlobalContext();
+  const insets = useSafeAreaInsets();
 
   const handleLogout = async () => {
     Alert.alert(
@@ -36,7 +37,15 @@ const Profile = () => {
   };
 
   return (
-    <SafeAreaView className='h-full bg-white'>
+    <View
+      className='h-full bg-white'
+      style={{
+        paddingTop: insets.top,
+        paddingBottom: insets.bottom,
+        paddingLeft: insets.left,
+        paddingRight: insets.right,
+      }}
+    >
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerClassName="pb-32 px-7">
@@ -71,7 +80,7 @@ const Profile = () => {
         </View>
 
       </ScrollView>
-    </SafeAreaView>
+    </View>
   )
 }
 

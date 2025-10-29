@@ -1,6 +1,6 @@
 import { ActivityIndicator, FlatList, Image, Text, TouchableOpacity, View } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import icons from "@/constants/icons";
 import Search from "@/components/Search";
 import { RegularCard } from "@/components/Cards";
@@ -116,8 +116,18 @@ export default function Explore() {
     setPage((prev) => prev + 1);
   };
 
+  const insets = useSafeAreaInsets();
+
   return (
-    <SafeAreaView className="bg-white h-full">
+    <View
+      className="bg-white h-full"
+      style={{
+        paddingTop: insets.top,
+        paddingBottom: insets.bottom,
+        paddingLeft: insets.left,
+        paddingRight: insets.right,
+      }}
+    >
       <FlatList
         data={filteredProperties}
         renderItem={renderProperty}
@@ -174,6 +184,6 @@ export default function Explore() {
         }
       />
 
-    </SafeAreaView>
+    </View>
   );
 }

@@ -1,6 +1,6 @@
 import { ActivityIndicator, FlatList, Image, Text, TouchableOpacity, View } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import icons from "@/constants/icons";
 import Search from "@/components/Search";
 import { FeaturedCard, RegularCard } from "@/components/Cards";
@@ -146,9 +146,18 @@ export default function Index() {
     if (hours < 18 && hours >= 12) return "Good afternoon";
     return "Good evening";
   })();
+  const insets = useSafeAreaInsets();
 
   return (
-    <SafeAreaView className="bg-white h-full">
+    <View
+      className="bg-white h-full"
+      style={{
+        paddingTop: insets.top,
+        paddingBottom: insets.bottom,
+        paddingLeft: insets.left,
+        paddingRight: insets.right,
+      }}
+    >
       <FlatList
         data={filteredProperties}
         renderItem={renderProperty}
@@ -239,6 +248,6 @@ export default function Index() {
         }
       />
 
-    </SafeAreaView>
+    </View>
   );
 }

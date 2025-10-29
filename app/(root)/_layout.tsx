@@ -1,16 +1,25 @@
 import { useGlobalContext } from "@/lib/global-provide";
 import { Redirect, Slot } from "expo-router";
-import { ActivityIndicator } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { ActivityIndicator, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function AppLayout() {
     const { loading, isLoggedIn } = useGlobalContext();
+    const insets = useSafeAreaInsets();
 
     if (loading) {
         return (
-            <SafeAreaView className="bg-white h-full flex justify-center items-center">
+            <View
+                className="bg-white h-full flex justify-center items-center"
+                style={{
+                    paddingTop: insets.top,
+                    paddingBottom: insets.bottom,
+                    paddingLeft: insets.left,
+                    paddingRight: insets.right,
+                }}
+            >
                 <ActivityIndicator className="text-primary-300" size="large" />
-            </SafeAreaView>
+            </View>
         )
     }
 

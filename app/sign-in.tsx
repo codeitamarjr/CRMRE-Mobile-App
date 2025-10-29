@@ -1,6 +1,6 @@
 import { View, Text, ScrollView, Image, TouchableOpacity, Alert } from 'react-native'
 import React from 'react'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import icons from '../constants/icons'
 import { useGlobalContext } from '@/lib/global-provide'
@@ -19,8 +19,18 @@ const SignIn = () => {
     refetch();
   };
 
+  const insets = useSafeAreaInsets();
+
   return (
-    <SafeAreaView className='bg-white h-full'>
+    <View
+      className='bg-white h-full'
+      style={{
+        paddingTop: insets.top,
+        paddingBottom: insets.bottom,
+        paddingLeft: insets.left,
+        paddingRight: insets.right,
+      }}
+    >
       <ScrollView>
       {/* <InfinityScrollScreen data={images} /> */}
       {/* <Image source={require('../assets/images/icon.png')} className='size-40 my-40 mx-auto' resizeMode='contain' /> */}
@@ -55,7 +65,7 @@ const SignIn = () => {
 
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   )
 }
 
