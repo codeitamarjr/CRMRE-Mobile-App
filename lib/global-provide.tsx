@@ -1,4 +1,12 @@
-import { createContext, ReactNode, useContext, useState, useCallback } from "react";
+import {
+    createContext,
+    ReactNode,
+    useContext,
+    useState,
+    useCallback,
+    useEffect,
+} from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Property } from "@/lib/crmre";
 
 interface User {
@@ -20,12 +28,14 @@ interface GlobalContextType {
 }
 
 const GlobalContext = createContext<GlobalContextType | undefined>(undefined);
+const FAVORITES_STORAGE_KEY = "crmre:favorites";
 
 export const GlobalProvider = ({ children }: { children: ReactNode }) => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [user] = useState<User | null>(null);
     const [loading, setLoading] = useState(false);
     const [favorites, setFavorites] = useState<Property[]>([]);
+    const [favoritesHydrated, setFavoritesHydrated] = useState(false);
 
     const login = useCallback(async () => {
         setLoading(true);
@@ -56,6 +66,43 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
         (propertyId: number) => favorites.some((item) => item.id === propertyId),
         [favorites]
     );
+
+    useEffect(() => {
+        const loadFavorites = async () => {
+            try {
+                const stored = await AsyncStorage.getItem(FAVORITES_STORAGE_KEY);
+                if (stored) {
+                    const parsed: unknown = JSON.parse(stored);
+                    if (Array.isArray(parsed)) {
+                        setFavorites(parsed as Property[]);
+                    }
+                }
+            } catch (error) {
+                console.warn("Failed to load favorites", error);
+            } finally {
+                setFavoritesHydrated(true);
+            }
+        };
+
+        loadFavorites();
+    }, []);
+
+    useEffect(() => {
+        if (!favoritesHydrated) return;
+
+        const persistFavorites = async () => {
+            try {
+                await AsyncStorage.setItem(
+                    FAVORITES_STORAGE_KEY,
+                    JSON.stringify(favorites)
+                );
+            } catch (error) {
+                console.warn("Failed to save favorites", error);
+            }
+        };
+
+        persistFavorites();
+    }, [favorites, favoritesHydrated]);
 
     return (
         <GlobalContext.Provider
