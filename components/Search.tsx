@@ -33,8 +33,11 @@ const Search: React.FC<SearchProps> = ({ initialQuery = '', onSearch, onFilterPr
                 />
             </View>
 
-            <TouchableOpacity onPress={onFilterPress} className='flex flex-row items-center justify-end z-50'>
-                <Image source={icons.filter} className='size-5' />
+            <TouchableOpacity
+                onPress={onFilterPress}
+                className='flex items-center justify-center ml-3 rounded-lg bg-primary-200 p-3 z-50'
+            >
+                <Image source={icons.filter} className='size-6' />
             </TouchableOpacity>
         </View>
     )

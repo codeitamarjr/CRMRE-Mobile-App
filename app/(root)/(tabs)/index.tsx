@@ -9,6 +9,7 @@ import { useGlobalContext } from "@/lib/global-provide";
 import { useCRMRE, getProperties, Property } from "@/lib/crmre";
 import NoResults from "@/components/NoResults";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import FiltersBottomSheet from "@/components/FiltersBottomSheet";
 
 export default function Index() {
   const { user } = useGlobalContext();
@@ -17,13 +18,33 @@ export default function Index() {
   const [page, setPage] = useState(1);
   const [aggregatedProperties, setAggregatedProperties] = useState<Property[]>([]);
   const [hasMore, setHasMore] = useState(true);
+  const [filtersVisible, setFiltersVisible] = useState(false);
+  const [appliedFilters, setAppliedFilters] = useState<{
+    bedrooms: number[];
+    minPrice?: string;
+    maxPrice?: string;
+  }>({ bedrooms: [] });
 
   const params = useLocalSearchParams<{ query?: string }>();
   const PER_PAGE = 20;
 
+  const apiFilters = useMemo(() => {
+    const result: Record<string, string | number | boolean | undefined> = {};
+
+    if (appliedFilters.bedrooms.length > 0) {
+      result.bedrooms = Math.min(...appliedFilters.bedrooms);
+    }
+
+    return result;
+  }, [appliedFilters]);
+
   const allUnitsParams = useMemo(
-    () => ({ page, perPage: PER_PAGE }),
-    [page]
+    () => ({
+      page,
+      perPage: PER_PAGE,
+      ...(Object.keys(apiFilters).length ? { filters: apiFilters } : {}),
+    }),
+    [page, PER_PAGE, apiFilters]
   );
   const featuredUnitsParams = useMemo(
     () => ({ featured: true, perPage: 10 }),
@@ -70,33 +91,83 @@ export default function Index() {
     setHasMore(properties.length >= PER_PAGE);
   }, [properties, page, PER_PAGE]);
 
+  useEffect(() => {
+    setPage(1);
+    setAggregatedProperties([]);
+    setHasMore(true);
+  }, [apiFilters]);
+
   // Filter locally
   const filteredProperties = useMemo(() => {
     const searchLower = searchTerm.toLowerCase();
+    const bedroomsFilter = appliedFilters.bedrooms;
 
-    return aggregatedProperties
-      .filter((property) =>
-        [
-          property.name,
-          property.address,
-          property.property?.name,
-          property.city,
-          property.country,
-          property.number,
-          property.unitCode,
-        ]
-          .filter(
-            (field): field is string =>
-              typeof field === "string" && field.trim().length > 0
-          )
-          .some((field) => field.toLowerCase().includes(searchLower))
-      )
-      .filter((property) =>
-        selectedFilter !== "All"
-          ? property.type?.toLowerCase() === selectedFilter.toLowerCase()
-          : true
+    const minPriceValue = appliedFilters.minPrice
+      ? Number(appliedFilters.minPrice)
+      : NaN;
+    const maxPriceValue = appliedFilters.maxPrice
+      ? Number(appliedFilters.maxPrice)
+      : NaN;
+
+    const normalizedMinPrice = Number.isFinite(minPriceValue)
+      ? minPriceValue
+      : null;
+    const normalizedMaxPrice = Number.isFinite(maxPriceValue)
+      ? maxPriceValue
+      : null;
+
+    return aggregatedProperties.filter((property) => {
+      const searchFields = [
+        property.name,
+        property.address,
+        property.property?.name,
+        property.city,
+        property.country,
+        property.number,
+        property.unitCode,
+      ].filter(
+        (field): field is string =>
+          typeof field === "string" && field.trim().length > 0
       );
-  }, [aggregatedProperties, searchTerm, selectedFilter]);
+
+      const matchesSearch = searchFields.some((field) =>
+        field.toLowerCase().includes(searchLower)
+      );
+
+      const matchesType =
+        selectedFilter === "All" ||
+        property.type?.toLowerCase() === selectedFilter.toLowerCase();
+
+      const matchesBedrooms =
+        bedroomsFilter.length === 0 ||
+        (property.bedrooms !== null &&
+          property.bedrooms !== undefined &&
+          bedroomsFilter.includes(Number(property.bedrooms)));
+
+      let priceValue: number | null = null;
+      if (
+        property.rateInfo?.price !== undefined &&
+        property.rateInfo?.price !== null
+      ) {
+        const numericPrice = Number(property.rateInfo.price);
+        if (!Number.isNaN(numericPrice)) {
+          priceValue = numericPrice;
+        }
+      }
+
+      const matchesMinPrice =
+        normalizedMinPrice === null ||
+        (priceValue !== null && priceValue >= normalizedMinPrice);
+
+      const matchesMaxPrice =
+        normalizedMaxPrice === null ||
+        (priceValue !== null && priceValue <= normalizedMaxPrice);
+
+      const matchesPrice = matchesMinPrice && matchesMaxPrice;
+
+      return matchesSearch && matchesType && matchesBedrooms && matchesPrice;
+    });
+  }, [aggregatedProperties, searchTerm, selectedFilter, appliedFilters]);
 
   const handleCardPress = useCallback(
     (property: Property) => {
@@ -131,6 +202,24 @@ export default function Index() {
   const handleFilterChange = (filter: string) => {
     setSelectedFilter(filter);
   };
+
+  const handleFilterPress = useCallback(() => {
+    setFiltersVisible(true);
+  }, []);
+
+  const handleApplyFilters = useCallback(
+    (filters: { bedrooms: number[]; minPrice?: string; maxPrice?: string }) => {
+      setFiltersVisible(false);
+      setAppliedFilters(filters);
+      setPage(1);
+    },
+    []
+  );
+
+  const handleResetFilters = useCallback(() => {
+    setAppliedFilters({ bedrooms: [] });
+    setPage(1);
+  }, []);
 
   const loadMore = () => {
     if (allProperties || !hasMore) {
@@ -188,7 +277,7 @@ export default function Index() {
               <Image source={icons.bell} className="size-6" />
             </View>
 
-            <Search onSearch={handleSearch} />
+            <Search onSearch={handleSearch} onFilterPress={handleFilterPress} />
 
             {/* Conditionally render the featured section */}
             {!searchTerm && (
@@ -248,6 +337,13 @@ export default function Index() {
         }
       />
 
+      <FiltersBottomSheet
+        visible={filtersVisible}
+        onClose={() => setFiltersVisible(false)}
+        filters={appliedFilters}
+        onApply={handleApplyFilters}
+        onReset={handleResetFilters}
+      />
     </View>
   );
 }
