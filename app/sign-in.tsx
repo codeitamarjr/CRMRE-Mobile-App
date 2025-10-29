@@ -2,11 +2,9 @@ import { View, Text, ScrollView, Image, TouchableOpacity, Alert } from 'react-na
 import React from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
-import images from '../constants/images'
 import icons from '../constants/icons'
 import { useGlobalContext } from '@/lib/global-provide'
 import { Redirect } from 'expo-router'
-import InfinityScrollScreen from '@/components/InfinityScrollScreen'
 
 const SignIn = () => {
   const { refetch, loading, isLoggedIn } = useGlobalContext();
@@ -14,26 +12,12 @@ const SignIn = () => {
   if (!loading && isLoggedIn) return <Redirect href="/" />
 
   const handleLogin = async () => {
-    const result = await login();
-
-    if (result) {
-      refetch();
-    } else {
-      Alert.alert('Error', 'Failed to login');
-    }
+    Alert.alert(
+      "Coming Soon",
+      "Sign-in is not yet configured for this build. Please continue exploring the app."
+    );
+    refetch();
   };
-
-  const images = [
-    "https://cdn.crmre.realenquiries.com/production/mdpm/attachments/properties/2/w0rws7vgIYuEMhRJXdJobeIHh1O94g5NETH5JAET.png",
-    "https://havenhomes.ie/wp-content/uploads/2024/07/20-Elgin-Road-3.png",
-    "https://balroyhalldublin.ie/wp-content/uploads/2024/08/Balroy_38-4604-1.jpg",
-    "https://havenhomes.ie/wp-content/uploads/2021/08/174b.png",
-    "https://havenhomes.ie/wp-content/uploads/2022/08/138-Rathgar-Rd-4.png",
-    "https://balroyhalldublin.ie/wp-content/uploads/2024/08/untitled-5266-1.jpg",
-    "https://balroyhalldublin.ie/wp-content/uploads/2024/08/Group-120.jpg",
-    "https://havenhomes.ie/wp-content/uploads/2024/07/20-Elgin-Road-2.png",
-    "https://balroyhalldublin.ie/wp-content/uploads/2024/08/Balroy-0699-1.jpg",
-  ];
 
   return (
     <SafeAreaView className='bg-white h-full'>

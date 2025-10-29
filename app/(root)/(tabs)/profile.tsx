@@ -28,19 +28,11 @@ const Profile = () => {
   const { user, refetch } = useGlobalContext();
 
   const handleLogout = async () => {
-    const result = await logout();
-
-    if (result) {
-      Alert.alert('Logout', 'You have been logged out successfully', [
-        {
-          text: 'OK',
-          onPress: () => refetch()
-        }
-      ]);
-      refetch();
-    } else {
-      Alert.alert('Error', 'Failed to logout');
-    }
+    Alert.alert(
+      "Coming Soon",
+      "Logout is not yet configured for this build."
+    );
+    await refetch();
   };
 
   return (

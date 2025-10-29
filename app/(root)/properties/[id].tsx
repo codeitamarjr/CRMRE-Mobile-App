@@ -35,6 +35,9 @@ const PropertyDetails = () => {
 
   const property = data && !Array.isArray(data) ? data : null;
 
+  const agent = property?.agent ?? property?.agents?.[0] ?? null;
+  const gallery = property?.gallery?.images ?? [];
+
   if (loading) {
     return (
       <View className="flex-1 justify-center items-center">
@@ -54,22 +57,31 @@ const PropertyDetails = () => {
     );
   }
 
-  const agent = Array.isArray(property.agent) ? property.agent[0] : {};
-  const gallery = property.gallery?.images || null;
-
   const getImageUri = (
-    gallery?: Property['gallery'],
-    property?: Property['property']
+    gallery?: Property["gallery"],
+    propertyDetails?: Property["property"]
   ): string => {
     return (
-      gallery?.cover ||
-      gallery?.images?.[0] ||
-      property?.gallery?.cover ||
-      null
+      gallery?.cover ??
+      gallery?.images?.[0] ??
+      propertyDetails?.gallery?.cover ??
+      ""
     );
   };
 
-  const coverUri = getImageUri(property.gallery, property.property);
+  const coverUri = getImageUri(property?.gallery, property?.property);
+
+  const propertyHeading = property
+    ? [property.type, property.number ?? property.unitCode ?? property.property?.code]
+        .filter(Boolean)
+        .join(" ")
+    : "";
+
+  const contactSubject = property
+    ? `Enquiry from Real Enquiries App - ${
+        propertyHeading || property.name || `Unit ${property.id}`
+      }`
+    : "Enquiry from Real Enquiries App";
 
   interface ImageWrapperProps {
     uri: string | null;
@@ -140,7 +152,9 @@ const PropertyDetails = () => {
 
         <View className="px-5 mt-7 flex gap-2">
           <Text className="text-2xl font-rubik-extrabold">
-            {property?.type} {property?.number} - {property?.property?.name}
+            {[propertyHeading, property?.property?.name || property?.name]
+              .filter(Boolean)
+              .join(" - ")}
           </Text>
 
           <View className="flex flex-row items-center gap-3">
@@ -163,19 +177,19 @@ const PropertyDetails = () => {
               <Image source={icons.bed} className="size-4" />
             </View>
             <Text className="text-black-300 text-sm font-rubik-medium ml-2">
-              {property?.bedrooms} Beds
+              {property?.bedrooms ?? "—"} Beds
             </Text>
             <View className="flex flex-row items-center justify-center bg-primary-100 rounded-full size-10 ml-7">
               <Image source={icons.bath} className="size-4" />
             </View>
             <Text className="text-black-300 text-sm font-rubik-medium ml-2">
-              {property?.bathrooms} Baths
+              {property?.bathrooms ?? "—"} Baths
             </Text>
             <View className="flex flex-row items-center justify-center bg-primary-100 rounded-full size-10 ml-7">
               <Image source={icons.area} className="size-4" />
             </View>
             <Text className="text-black-300 text-sm font-rubik-medium ml-2">
-              {property?.area} Sqm
+              {property?.area ?? "—"} Sqm
             </Text>
           </View>
 
@@ -184,42 +198,68 @@ const PropertyDetails = () => {
               Agent
             </Text>
 
-            <View className="flex flex-row items-center justify-between mt-4">
-              <View className="flex flex-row items-center">
-                <View className="inline-flex size-14 items-center justify-center rounded-full bg-gray-500">
-                  <Text className="text-xs font-medium text-white">
-                    {agent?.name?.charAt(0)} {agent?.name?.split(" ")[1]?.charAt(0)}
-                  </Text>
-                </View>
-
-                <View className="flex flex-col items-start justify-center ml-3">
-                  <Text className="text-lg text-black-300 text-start font-rubik-bold">
-                    {agent.name}
-                  </Text>
-                  <TouchableOpacity
-                    onPress={() =>
-                      Linking.openURL(`mailto:${agent.email}?subject=Enquiry from Real Enquiries App - ${property.type} ${property.number} - ${property.address}`)
-                    }
-                  >
-                    <Text className="text-sm text-black-200 text-start font-rubik-medium">
-                      {agent.email}
+            {agent ? (
+              <View className="flex flex-row items-center justify-between mt-4">
+                <View className="flex flex-row items-center">
+                  <View className="inline-flex size-14 items-center justify-center rounded-full bg-gray-500">
+                    <Text className="text-xs font-medium text-white">
+                      {agent.name
+                        ?.split(" ")
+                        .map((part) => part.charAt(0))
+                        .join("")
+                        .slice(0, 2)}
                     </Text>
-                  </TouchableOpacity>
+                  </View>
+
+                  <View className="flex flex-col items-start justify-center ml-3">
+                    <Text className="text-lg text-black-300 text-start font-rubik-bold">
+                      {agent.name}
+                    </Text>
+                    {agent.email ? (
+                      <TouchableOpacity
+                        onPress={() =>
+                          Linking.openURL(
+                            `mailto:${agent.email}?subject=${encodeURIComponent(
+                              contactSubject
+                            )}`
+                          )
+                        }
+                      >
+                        <Text className="text-sm text-black-200 text-start font-rubik-medium">
+                          {agent.email}
+                        </Text>
+                      </TouchableOpacity>
+                    ) : null}
+                  </View>
+                </View>
+                <View className="flex flex-row items-center gap-3">
+                  {agent.email ? (
+                    <TouchableOpacity
+                      onPress={() =>
+                        Linking.openURL(
+                          `mailto:${agent.email}?subject=${encodeURIComponent(
+                            contactSubject
+                          )}`
+                        )
+                      }
+                    >
+                      <Image source={icons.chat} className="size-7" />
+                    </TouchableOpacity>
+                  ) : null}
+                  {agent.phone ? (
+                    <TouchableOpacity
+                      onPress={() => Linking.openURL(`tel:${agent.phone}`)}
+                    >
+                      <Image source={icons.phone} className="size-7" />
+                    </TouchableOpacity>
+                  ) : null}
                 </View>
               </View>
-              <View className="flex flex-row items-center gap-3">
-                <TouchableOpacity
-                  onPress={() => Linking.openURL(`mailto:${agent.email}?subject=Enquiry from Real Enquiries App - ${property.type} ${property.number} - ${property.address}`)}
-                >
-                  <Image source={icons.chat} className="size-7" />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => Linking.openURL(`tel:${agent.phone}`)}
-                >
-                  <Image source={icons.phone} className="size-7" />
-                </TouchableOpacity>
-              </View>
-            </View>
+            ) : (
+              <Text className="text-black-200 text-sm font-rubik mt-4">
+                Agent details are not available for this unit.
+              </Text>
+            )}
           </View>
 
           <View className="mt-7">
@@ -239,33 +279,31 @@ const PropertyDetails = () => {
             {/* Render facilities */}
             {Array.isArray(property?.facilities) && property.facilities.length > 0 && (
               <View className="flex flex-row flex-wrap items-start justify-start mt-2 gap-5">
-                {property.facilities.map((item: { identifier: keyof typeof icons, facility: string }, index) => (
-                  <View
-                    key={item.identifier || index}
-                    className="flex flex-1 flex-col items-center min-w-16 max-w-20"
-                  >
-                    {/* Map facility identifier to an icon */}
-                    <View className="size-14 bg-primary-100 rounded-full flex items-center justify-center">
-                      <Image
-                        source={icons[item.identifier] || icons.info}
-                        className="size-6"
-                      />
-                    </View>
+                {property.facilities.map((item, index) => {
+                  const iconKey = (item.identifier ?? "info") as keyof typeof icons;
+                  const iconSource = icons[iconKey] ?? icons.info;
 
-                    {/* Facility name */}
-                    <Text
-                      className="text-black-300 text-sm text-center font-rubik mt-1.5"
+                  return (
+                    <View
+                      key={`${item.identifier ?? "facility"}-${index}`}
+                      className="flex flex-1 flex-col items-center min-w-16 max-w-20"
                     >
-                      {item.facility}
-                    </Text>
-                  </View>
-                ))}
+                      <View className="size-14 bg-primary-100 rounded-full flex items-center justify-center">
+                        <Image source={iconSource} className="size-6" />
+                      </View>
+
+                      <Text className="text-black-300 text-sm text-center font-rubik mt-1.5">
+                        {item.facility}
+                      </Text>
+                    </View>
+                  );
+                })}
               </View>
             )}
 
           </View>
 
-          {gallery?.length > 0 && (
+          {gallery.length > 0 && (
             <GalleryComponent gallery={gallery} />
           )}
 
@@ -276,13 +314,16 @@ const PropertyDetails = () => {
             <View className="flex flex-row items-center justify-start mt-4 gap-2">
               <Image source={icons.location} className="w-7 h-7" />
               <Text className="text-black-200 text-sm font-rubik-medium">
-                {property?.address}
+                {property?.address ||
+                  [property?.city, property?.country].filter(Boolean).join(", ")}
               </Text>
             </View>
 
-            {Platform.OS === 'ios' && property?.coordinates?.latitude && property?.coordinates?.longitude && (
-              <MapCard property={property} />
-            )}
+            {property?.coordinates &&
+              property.coordinates.latitude !== null &&
+              property.coordinates.longitude !== null && (
+                <MapCard property={property} />
+              )}
 
 
           </View>

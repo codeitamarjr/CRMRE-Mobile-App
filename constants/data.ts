@@ -127,11 +127,11 @@ export const facilities = [
   },
   {
     title: "Wifi",
-    icon: icons.wifi,
+    icon: icons.freeWifi,
   },
   {
     title: "Pet Center",
-    icon: icons.dog,
+    icon: icons.petFriendly,
   },
 ];
 
