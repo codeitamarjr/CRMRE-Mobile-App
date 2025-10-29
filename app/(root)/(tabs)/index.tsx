@@ -278,7 +278,7 @@ export default function Index() {
                     {greeting},
                   </Text>
                   <Text className="text-base font-rubik-medium text-black-300 dark:text-slate-100">
-                    {user?.name}
+                    {user?.name || "Anonymous"}
                   </Text>
                 </View>
               </View>
