@@ -1,5 +1,4 @@
 import {
-  FlatList,
   Image,
   ScrollView,
   Text,
@@ -9,22 +8,27 @@ import {
   Platform,
   ActivityIndicator,
   Linking,
+  Share,
+  Alert,
 } from "react-native";
+import type { ShareContent } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 
 import icons from "@/constants/icons";
 import images from "@/constants/images";
 import Comment from "@/components/Comment";
 
-import { useMemo } from "react";
+import { useMemo, useCallback } from "react";
 import { getProperties, useCRMRE, Property } from "@/lib/crmre";
 import { MapCard } from "@/components/Maps";
 import Carrousel from "@/components/Carrousel";
 import GalleryComponent from "@/components/GalleryComponent";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const PropertyDetails = () => {
   const { id } = useLocalSearchParams<{ id?: string }>();
   const windowHeight = Dimensions.get("window").height;
+  const insets = useSafeAreaInsets();
 
   const params = useMemo(() => ({ id: Number(id) }), [id]);
 
@@ -37,6 +41,46 @@ const PropertyDetails = () => {
 
   const agent = property?.agent ?? property?.agents?.[0] ?? null;
   const gallery = property?.gallery?.images ?? [];
+
+  const propertyHeading = property
+    ? [
+        property.type,
+        property.number ?? property.unitCode ?? property.property?.code,
+      ]
+        .filter(Boolean)
+        .join(" ")
+    : "";
+
+  const handleShare = useCallback(async () => {
+    const shareUrl =
+      property?.application_url ??
+      property?.property?.application_url ??
+      "https://realenquiries.com";
+
+    const messageBase = propertyHeading
+      ? `Check out ${propertyHeading} on the Real Enquiries app.`
+      : "Check out this property on the Real Enquiries app.";
+    const message = `${messageBase} ${shareUrl}`;
+
+    const shareContent: ShareContent =
+      Platform.OS === "ios"
+        ? { url: shareUrl, message }
+        : { message };
+
+    try {
+      await Share.share(shareContent);
+    } catch (error) {
+      console.warn("Property share failed", error);
+      Alert.alert(
+        "Sharing unavailable",
+        `We couldn't open the share sheet. You can manually share this link:\n\n${shareUrl}`
+      );
+    }
+  }, [
+    property?.application_url,
+    property?.property?.application_url,
+    propertyHeading,
+  ]);
 
   if (loading) {
     return (
@@ -71,11 +115,6 @@ const PropertyDetails = () => {
 
   const coverUri = getImageUri(property?.gallery, property?.property);
 
-  const propertyHeading = property
-    ? [property.type, property.number ?? property.unitCode ?? property.property?.code]
-        .filter(Boolean)
-        .join(" ")
-    : "";
   const propertyDescription =
     property?.description?.trim() ||
     property?.property?.description?.trim() ||
@@ -127,7 +166,7 @@ const PropertyDetails = () => {
           <View
             className="z-50 absolute inset-x-7"
             style={{
-              top: Platform.OS === "ios" ? 70 : 20,
+              top: Platform.OS === "ios" ? Math.max(insets.top + 20, 70) : insets.top + 16,
             }}
           >
             <View className="flex flex-row items-center w-full justify-between">
@@ -143,12 +182,19 @@ const PropertyDetails = () => {
               </TouchableOpacity>
 
               <View className="flex flex-row items-center gap-3">
-                <Image
-                  source={icons.heart}
-                  className="size-7"
-                  tintColor={"#191D31"}
-                />
-                <Image source={icons.send} className="size-7" />
+                <View className="size-12 justify-center items-center bg-primary-300/70 rounded-full">
+                  <Image
+                    source={icons.heart}
+                    className="size-6"
+                    tintColor={"white"}
+                  />
+                </View>
+                <TouchableOpacity
+                  onPress={handleShare}
+                  className="size-12 justify-center items-center bg-primary-300/70 rounded-full"
+                >
+                  <Image source={icons.send} className="size-6" style={{ tintColor: "white" }} />
+                </TouchableOpacity>
               </View>
             </View>
           </View>
@@ -377,7 +423,10 @@ const PropertyDetails = () => {
               if (property?.application_url) {
                 Linking.openURL(property.application_url);
               } else {
-                alert('Application URL not available');
+                Alert.alert(
+                  "Application link unavailable",
+                  "We couldn't find a link to apply for this property just yet."
+                );
               }
             }}
           >
