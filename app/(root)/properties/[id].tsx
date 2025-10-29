@@ -24,11 +24,13 @@ import { MapCard } from "@/components/Maps";
 import Carrousel from "@/components/Carrousel";
 import GalleryComponent from "@/components/GalleryComponent";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useGlobalContext } from "@/lib/global-provide";
 
 const PropertyDetails = () => {
   const { id } = useLocalSearchParams<{ id?: string }>();
   const windowHeight = Dimensions.get("window").height;
   const insets = useSafeAreaInsets();
+  const { toggleFavorite, isFavorite } = useGlobalContext();
 
   const params = useMemo(() => ({ id: Number(id) }), [id]);
 
@@ -81,6 +83,14 @@ const PropertyDetails = () => {
     property?.property?.application_url,
     propertyHeading,
   ]);
+
+  const isPropertyFavorite = property?.id ? isFavorite(property.id) : false;
+
+  const handleToggleFavorite = useCallback(() => {
+    if (property) {
+      toggleFavorite(property);
+    }
+  }, [property, toggleFavorite]);
 
   if (loading) {
     return (
@@ -182,16 +192,23 @@ const PropertyDetails = () => {
               </TouchableOpacity>
 
               <View className="flex flex-row items-center gap-3">
-                <View className="size-12 justify-center items-center bg-primary-300/70 rounded-full">
+                <TouchableOpacity
+                  onPress={handleToggleFavorite}
+                  className={`size-12 justify-center items-center rounded-full ${
+                    isPropertyFavorite ? "bg-danger" : "bg-primary-300/70"
+                  }`}
+                  activeOpacity={0.8}
+                >
                   <Image
                     source={icons.heart}
                     className="size-6"
-                    tintColor={"white"}
+                    style={{ tintColor: "white" }}
                   />
-                </View>
+                </TouchableOpacity>
                 <TouchableOpacity
                   onPress={handleShare}
                   className="size-12 justify-center items-center bg-primary-300/70 rounded-full"
+                  activeOpacity={0.8}
                 >
                   <Image source={icons.send} className="size-6" style={{ tintColor: "white" }} />
                 </TouchableOpacity>

@@ -2,7 +2,14 @@ import React, { memo, useCallback } from "react";
 import icons from "@/constants/icons";
 import images from "@/constants/images";
 import { Property } from "@/lib/crmre";
-import { View, Text, TouchableOpacity, Image } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  GestureResponderEvent,
+} from "react-native";
+import { useGlobalContext } from "@/lib/global-provide";
 
 interface Props {
   item: Property;
@@ -45,6 +52,15 @@ const FeaturedCardComponent = ({ item, onPress }: Props) => {
   const handlePress = useCallback(() => {
     onPress?.(item);
   }, [onPress, item]);
+  const { isFavorite, toggleFavorite } = useGlobalContext();
+  const isItemFavorite = item?.id ? isFavorite(item.id) : false;
+  const handleFavoritePress = useCallback(
+    (event: GestureResponderEvent) => {
+      event.stopPropagation?.();
+      toggleFavorite(item);
+    },
+    [toggleFavorite, item]
+  );
 
   return (
     <TouchableOpacity
@@ -78,7 +94,9 @@ const FeaturedCardComponent = ({ item, onPress }: Props) => {
           <Text className="text-xl font-rubik-extra-bold text-white">
             {item.rate}
           </Text>
-          <FavoriteIcon />
+          <TouchableOpacity onPress={handleFavoritePress} activeOpacity={0.8}>
+            <FavoriteIcon tintColor={isItemFavorite ? "#F75555" : "#191d31"} />
+          </TouchableOpacity>
         </View>
       </View>
     </TouchableOpacity>
@@ -91,6 +109,15 @@ const RegularCardComponent = ({ item, onPress }: Props) => {
     item.name ||
     [item.type, item.number ?? item.unitCode].filter(Boolean).join(" ") ||
     "Property";
+  const { isFavorite, toggleFavorite } = useGlobalContext();
+  const isItemFavorite = item?.id ? isFavorite(item.id) : false;
+  const handleFavoritePress = useCallback(
+    (event: GestureResponderEvent) => {
+      event.stopPropagation?.();
+      toggleFavorite(item);
+    },
+    [toggleFavorite, item]
+  );
 
   const handlePress = useCallback(() => {
     onPress?.(item);
@@ -125,7 +152,9 @@ const RegularCardComponent = ({ item, onPress }: Props) => {
           <Text className="text-base font-rubik-bold text-primary-300">
             {item.rate}
           </Text>
-          <FavoriteIcon tintColor="#191d31" />
+          <TouchableOpacity onPress={handleFavoritePress} activeOpacity={0.8}>
+            <FavoriteIcon tintColor={isItemFavorite ? "#F75555" : "#191d31"} />
+          </TouchableOpacity>
         </View>
       </View>
     </TouchableOpacity>

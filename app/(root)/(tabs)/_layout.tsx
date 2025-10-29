@@ -11,7 +11,7 @@ const TabIcon = ({ focused, icon, title }: {
 }) => (
     <View className='flex flex-col flex-1 mt-2 items-center'>
         <Image source={icon} tintColor={focused ? '#0061FF' : '#666876'} resizeMode='contain' className='size-6' />
-        <Text className='{focused ? "text-primary-300 font-rubik-medium" : "text-gray-500 font-rubik"} text-sm w-full text-center mt-1'>
+        <Text className={`${focused ? "text-primary-300 font-rubik-medium" : "text-gray-500 font-rubik"} text-sm text-center mt-1`}>
             {title}
         </Text>
     </View>
@@ -54,6 +54,19 @@ function TabsLayout() {
                             icon={icons.search}
                             focused={focused}
                             title="Explore"
+                        />
+                    )
+                }} />
+                <Tabs.Screen
+                name="favorites"
+                options={{
+                    title: 'Favourites',
+                    headerShown: false,
+                    tabBarIcon: ({ focused }) => (
+                        <TabIcon
+                            icon={icons.heart}
+                            focused={focused}
+                            title="Favourites"
                         />
                     )
                 }} />

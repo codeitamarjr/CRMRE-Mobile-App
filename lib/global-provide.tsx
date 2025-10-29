@@ -1,4 +1,5 @@
 import { createContext, ReactNode, useContext, useState, useCallback } from "react";
+import { Property } from "@/lib/crmre";
 
 interface User {
     $id: string;
@@ -13,6 +14,9 @@ interface GlobalContextType {
     loading: boolean;
     refetch: () => Promise<void>;
     login: () => Promise<void>;
+    favorites: Property[];
+    toggleFavorite: (property: Property) => void;
+    isFavorite: (propertyId: number) => boolean;
 }
 
 const GlobalContext = createContext<GlobalContextType | undefined>(undefined);
@@ -21,6 +25,7 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [user] = useState<User | null>(null);
     const [loading, setLoading] = useState(false);
+    const [favorites, setFavorites] = useState<Property[]>([]);
 
     const login = useCallback(async () => {
         setLoading(true);
@@ -35,6 +40,23 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
         // Placeholder for future refresh logic
     }, []);
 
+    const toggleFavorite = useCallback((property: Property) => {
+        if (!property?.id) return;
+
+        setFavorites((prev) => {
+            const exists = prev.some((item) => item.id === property.id);
+            if (exists) {
+                return prev.filter((item) => item.id !== property.id);
+            }
+            return [...prev, property];
+        });
+    }, []);
+
+    const isFavorite = useCallback(
+        (propertyId: number) => favorites.some((item) => item.id === propertyId),
+        [favorites]
+    );
+
     return (
         <GlobalContext.Provider
             value={{
@@ -43,6 +65,9 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
                 loading,
                 refetch,
                 login,
+                favorites,
+                toggleFavorite,
+                isFavorite,
             }}
         >
             {children}
