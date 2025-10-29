@@ -219,6 +219,7 @@ interface CRMREPropertyDetails {
   name?: string | null;
   city?: string | null;
   country?: string | null;
+  description?: string | null;
   facilities?: CRMREFacility[] | null;
   client?: {
     name?: string | null;
@@ -295,6 +296,7 @@ export interface Property {
     name?: string | null;
     city?: string | null;
     country?: string | null;
+    description?: string | null;
     gallery?: {
       cover?: string | null;
     };
@@ -510,6 +512,9 @@ const mapUnitToProperty = (unit: CRMREUnit): Property => {
       ]
     : combinedGalleryImages;
 
+  const selfLink = resolveMediaUrl(unit.links?.self, CRMRE_APP_BASE_URL);
+  const applyLink = resolveMediaUrl(unit.links?.apply, CRMRE_APP_BASE_URL);
+
   const computedAddress =
     full ||
     [
@@ -549,28 +554,31 @@ const mapUnitToProperty = (unit: CRMREUnit): Property => {
       cover: galleryCover,
       images: galleryImagesWithCover,
     },
-    property: unit.property
-      ? {
-          code: unit.property.code ?? null,
-          name: unit.property.name ?? null,
-          city: unit.property.city ?? null,
-          country: unit.property.country ?? null,
-          gallery: propertyGalleryCover
-            ? {
-                cover: propertyGalleryCover,
-              }
+  property: unit.property
+    ? {
+        code: unit.property.code ?? null,
+        name: unit.property.name ?? null,
+        city: unit.property.city ?? null,
+        country: unit.property.country ?? null,
+        description: unit.property?.description ?? null,
+        gallery: propertyGalleryCover
+          ? {
+              cover: propertyGalleryCover,
+            }
             : undefined,
         }
       : null,
     facilities,
     agents,
     agent: agents[0] ?? null,
-    application_url: unit.links?.apply ?? unit.links?.self ?? null,
+    application_url: applyLink ?? null,
     coordinates: {
       latitude,
       longitude,
     },
-    links: unit.links ?? {},
+    links: {
+      apply: applyLink ?? null,
+    },
     views: unit.views ?? null,
     raw: unit,
   };

@@ -76,6 +76,10 @@ const PropertyDetails = () => {
         .filter(Boolean)
         .join(" ")
     : "";
+  const propertyDescription =
+    property?.description?.trim() ||
+    property?.property?.description?.trim() ||
+    null;
 
   const contactSubject = property
     ? `Enquiry from Real Enquiries App - ${
@@ -267,7 +271,7 @@ const PropertyDetails = () => {
               Overview
             </Text>
             <Text className="text-black-200 text-base font-rubik mt-2">
-              {property?.description || 'No description available'}
+              {propertyDescription || "No description available"}
             </Text>
           </View>
 
