@@ -108,7 +108,9 @@ const FiltersBottomSheet: React.FC<FiltersBottomSheetProps> = ({
       ? Math.max(0, keyboardHeight - (insets.bottom || 0))
       : keyboardHeight;
 
-  const sheetPaddingBottom = (insets.bottom || 0) + keyboardInset;
+  const sheetPaddingBottom = keyboardInset;
+  const sheetInnerPaddingBottom =
+    24 + Math.max(0, (insets.bottom || 0) - keyboardInset);
 
   const sheetContent = (
     <>
@@ -116,7 +118,7 @@ const FiltersBottomSheet: React.FC<FiltersBottomSheetProps> = ({
         <View style={styles.backdrop} />
       </TouchableWithoutFeedback>
       <View style={[styles.sheet, { paddingBottom: sheetPaddingBottom }]}>
-        <View style={styles.sheetInner}>
+        <View style={[styles.sheetInner, { paddingBottom: sheetInnerPaddingBottom }]}>
           <View className="flex flex-row items-center justify-between">
             <Text className="text-lg font-rubik-bold text-black-300">Filters</Text>
             {hasActiveFilters && (
