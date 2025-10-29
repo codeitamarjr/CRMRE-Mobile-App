@@ -12,6 +12,7 @@ import {
   StyleSheet,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useGlobalContext } from "@/lib/global-provide";
 
 interface FiltersState {
   bedrooms: number[];
@@ -41,6 +42,9 @@ const FiltersBottomSheet: React.FC<FiltersBottomSheetProps> = ({
   const [maxPrice, setMaxPrice] = useState<string>("");
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const insets = useSafeAreaInsets();
+  const { theme } = useGlobalContext();
+  const isDark = theme === "dark";
+  const placeholderColor = isDark ? "#94A3B8" : "#666876";
 
   useEffect(() => {
     if (visible) {
@@ -117,10 +121,24 @@ const FiltersBottomSheet: React.FC<FiltersBottomSheetProps> = ({
       <TouchableWithoutFeedback onPress={onClose}>
         <View style={styles.backdrop} />
       </TouchableWithoutFeedback>
-      <View style={[styles.sheet, { paddingBottom: sheetPaddingBottom }]}>
-        <View style={[styles.sheetInner, { paddingBottom: sheetInnerPaddingBottom }]}>
+      <View
+        style={[
+          styles.sheet,
+          isDark ? styles.sheetDark : styles.sheetLight,
+          { paddingBottom: sheetPaddingBottom },
+        ]}
+      >
+        <View
+          style={[
+            styles.sheetInner,
+            isDark ? styles.sheetInnerDark : styles.sheetInnerLight,
+            { paddingBottom: sheetInnerPaddingBottom },
+          ]}
+        >
           <View className="flex flex-row items-center justify-between">
-            <Text className="text-lg font-rubik-bold text-black-300">Filters</Text>
+            <Text className="text-lg font-rubik-bold text-black-300 dark:text-slate-100">
+              Filters
+            </Text>
             {hasActiveFilters && (
               <TouchableOpacity onPress={handleReset}>
                 <Text className="text-primary-300 text-base font-rubik-medium">
@@ -137,7 +155,7 @@ const FiltersBottomSheet: React.FC<FiltersBottomSheetProps> = ({
             keyboardDismissMode="on-drag"
           >
             <View className="mt-2">
-              <Text className="text-base font-rubik-medium text-black-300">
+              <Text className="text-base font-rubik-medium text-black-300 dark:text-slate-100">
                 Bedrooms
               </Text>
               <View className="flex flex-row flex-wrap gap-2 mt-3">
@@ -150,12 +168,14 @@ const FiltersBottomSheet: React.FC<FiltersBottomSheetProps> = ({
                       className={`px-4 py-2 rounded-full border ${
                         selected
                           ? "bg-primary-300 border-primary-300"
-                          : "border-primary-200"
+                          : "border-primary-200 dark:border-slate-700 dark:bg-slate-900"
                       }`}
                     >
                       <Text
                         className={`text-sm font-rubik-medium ${
-                          selected ? "text-white" : "text-black-300"
+                          selected
+                            ? "text-white"
+                            : "text-black-300 dark:text-slate-100"
                         }`}
                       >
                         {option} Beds
@@ -167,30 +187,32 @@ const FiltersBottomSheet: React.FC<FiltersBottomSheetProps> = ({
             </View>
 
             <View className="mt-6">
-              <Text className="text-base font-rubik-medium text-black-300">
+              <Text className="text-base font-rubik-medium text-black-300 dark:text-slate-100">
                 Monthly Price Range (€)
               </Text>
               <View className="flex flex-row items-center justify-between mt-3 gap-4">
                 <View className="flex-1">
-                  <Text className="text-xs font-rubik text-black-200 mb-1">Min</Text>
+                  <Text className="text-xs font-rubik text-black-200 dark:text-slate-400 mb-1">Min</Text>
                   <TextInput
-                    className="border border-primary-200 rounded-lg px-3 py-2 text-sm font-rubik text-black-300"
+                    className="border border-primary-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm font-rubik text-black-300 dark:text-slate-100 dark:bg-slate-900"
                     placeholder="0"
                     keyboardType="numeric"
                     value={minPrice}
                     onChangeText={setMinPrice}
                     returnKeyType="done"
+                    placeholderTextColor={placeholderColor}
                   />
                 </View>
                 <View className="flex-1">
-                  <Text className="text-xs font-rubik text-black-200 mb-1">Max</Text>
+                  <Text className="text-xs font-rubik text-black-200 dark:text-slate-400 mb-1">Max</Text>
                   <TextInput
-                    className="border border-primary-200 rounded-lg px-3 py-2 text-sm font-rubik text-black-300"
+                    className="border border-primary-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm font-rubik text-black-300 dark:text-slate-100 dark:bg-slate-900"
                     placeholder="Any"
                     keyboardType="numeric"
                     value={maxPrice}
                     onChangeText={setMaxPrice}
                     returnKeyType="done"
+                    placeholderTextColor={placeholderColor}
                   />
                 </View>
               </View>
@@ -199,7 +221,7 @@ const FiltersBottomSheet: React.FC<FiltersBottomSheetProps> = ({
 
           <TouchableOpacity
             onPress={handleApply}
-            className="bg-primary-300 py-3 rounded-full shadow-md shadow-zinc-300"
+            className="bg-primary-300 py-3 rounded-full shadow-md shadow-zinc-300 dark:shadow-black/40"
           >
             <Text className="text-white text-center text-base font-rubik-bold">
               Apply Filters
@@ -235,7 +257,6 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
   },
   sheet: {
-    backgroundColor: "rgba(0, 97, 255, 0.08)",
     paddingTop: 2,
     paddingHorizontal: 0,
     borderTopLeftRadius: 28,
@@ -244,8 +265,13 @@ const styles = StyleSheet.create({
     borderTopEndRadius: 28,
     overflow: "hidden",
   },
+  sheetLight: {
+    backgroundColor: "rgba(0, 97, 255, 0.08)",
+  },
+  sheetDark: {
+    backgroundColor: "rgba(37, 99, 235, 0.18)",
+  },
   sheetInner: {
-    backgroundColor: "#FFFFFF",
     borderTopLeftRadius: 22,
     borderTopRightRadius: 22,
     borderTopStartRadius: 22,
@@ -256,5 +282,11 @@ const styles = StyleSheet.create({
     marginHorizontal: 2,
     marginTop: 2,
     overflow: "hidden",
+  },
+  sheetInnerLight: {
+    backgroundColor: "#FFFFFF",
+  },
+  sheetInnerDark: {
+    backgroundColor: "#0B1120",
   },
 });

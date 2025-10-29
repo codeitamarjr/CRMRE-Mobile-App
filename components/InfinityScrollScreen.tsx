@@ -6,11 +6,14 @@ import {
     FlatList as RNFlatList,
 } from "react-native";
 import { LinearGradient } from 'expo-linear-gradient';
+import { useGlobalContext } from "@/lib/global-provide";
 
 const screenWidth = Dimensions.get("window").width;
 const screenHeight = Dimensions.get("window").height;
 
 const InfinityScrollGrid = ({ data }: { data: string[] }) => {
+    const { theme } = useGlobalContext();
+    const isDark = theme === "dark";
 
     const flatListRef = useRef<RNFlatList<string>>(null);
     const scrollOffset = useRef(0);
@@ -45,10 +48,10 @@ const InfinityScrollGrid = ({ data }: { data: string[] }) => {
                 margin: 5,
                 borderRadius: 10,
                 overflow: "hidden",
-                backgroundColor: "white",
+                backgroundColor: isDark ? "#0F172A" : "#FFFFFF",
                 shadowColor: "#000",
                 shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.1,
+                shadowOpacity: isDark ? 0.35 : 0.1,
                 shadowRadius: 5,
             }}
         >
@@ -64,9 +67,13 @@ const InfinityScrollGrid = ({ data }: { data: string[] }) => {
     );
 
     return (
-        <View style={{ height: screenHeight * 0.57, backgroundColor: "#f3f3f3" }}>
+        <View style={{ height: screenHeight * 0.57, backgroundColor: isDark ? "#0B1120" : "#f3f3f3" }}>
             <LinearGradient
-                colors={['rgba(255,255,255,1)', 'rgba(255,255,255,0)']}
+                colors={
+                    isDark
+                        ? ['rgba(15,23,42,1)', 'rgba(15,23,42,0)']
+                        : ['rgba(255,255,255,1)', 'rgba(255,255,255,0)']
+                }
                 style={{
                     position: 'absolute',
                     left: 0,
@@ -77,7 +84,11 @@ const InfinityScrollGrid = ({ data }: { data: string[] }) => {
                 }}
             />
             <LinearGradient
-                colors={['rgba(255,255,255,0)', 'rgba(255,255,255,1)']}
+                colors={
+                    isDark
+                        ? ['rgba(15,23,42,0)', 'rgba(15,23,42,1)']
+                        : ['rgba(255,255,255,0)', 'rgba(255,255,255,1)']
+                }
                 style={{
                     position: 'absolute',
                     left: 0,

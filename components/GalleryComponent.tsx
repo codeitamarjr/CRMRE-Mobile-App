@@ -28,7 +28,7 @@ const GalleryComponent = ({ gallery }: { gallery: string[] }) => {
 
     return (
         <View className="mt-7">
-            <Text className="text-black-300 text-xl font-rubik-bold">Gallery</Text>
+            <Text className="text-black-300 dark:text-slate-100 text-xl font-rubik-bold">Gallery</Text>
             <FlatList
                 contentContainerStyle={{ paddingRight: 20 }}
                 data={gallery}

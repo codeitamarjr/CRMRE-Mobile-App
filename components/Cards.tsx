@@ -22,9 +22,19 @@ const getImageUri = (property: Property) =>
   property.property?.gallery?.cover ||
   null;
 
-const ViewsBadge = ({ number }: { number?: number | null }) => (
-  <View className="flex flex-row items-center bg-white/90 px-3 py-1.5 rounded-full absolute top-5 right-5">
-    <Image source={icons.view} className="size-3.5" />
+const ViewsBadge = ({
+  number,
+  isDark,
+}: {
+  number?: number | null;
+  isDark: boolean;
+}) => (
+  <View className="flex flex-row items-center bg-white/90 dark:bg-slate-900/80 px-3 py-1.5 rounded-full absolute top-5 right-5">
+    <Image
+      source={icons.view}
+      className="size-3.5"
+      style={isDark ? { tintColor: "#CBD5F5" } : undefined}
+    />
     <Text className="text-xs font-rubik-bold text-primary-300 ml-1">
       {(number ?? 0).toLocaleString()}
     </Text>
@@ -52,7 +62,8 @@ const FeaturedCardComponent = ({ item, onPress }: Props) => {
   const handlePress = useCallback(() => {
     onPress?.(item);
   }, [onPress, item]);
-  const { isFavorite, toggleFavorite } = useGlobalContext();
+  const { isFavorite, toggleFavorite, theme } = useGlobalContext();
+  const isDark = theme === "dark";
   const isItemFavorite = item?.id ? isFavorite(item.id) : false;
   const handleFavoritePress = useCallback(
     (event: GestureResponderEvent) => {
@@ -77,7 +88,7 @@ const FeaturedCardComponent = ({ item, onPress }: Props) => {
         source={images.cardGradient}
         className="size-full rounded-2xl absolute bottom-0"
       />
-      <ViewsBadge number={item.views} />
+      <ViewsBadge number={item.views} isDark={isDark} />
 
       <View className="flex flex-col items-start absolute bottom-5 inset-x-5">
         <Text className="text-xl font-rubik-extra-bold text-white" numberOfLines={1}>
@@ -95,7 +106,9 @@ const FeaturedCardComponent = ({ item, onPress }: Props) => {
             {item.rate}
           </Text>
           <TouchableOpacity onPress={handleFavoritePress} activeOpacity={0.8}>
-            <FavoriteIcon tintColor={isItemFavorite ? "#F75555" : "#191d31"} />
+            <FavoriteIcon
+              tintColor={isItemFavorite ? "#F75555" : isDark ? "#E2E8F0" : "#191d31"}
+            />
           </TouchableOpacity>
         </View>
       </View>
@@ -109,8 +122,9 @@ const RegularCardComponent = ({ item, onPress }: Props) => {
     item.name ||
     [item.type, item.number ?? item.unitCode].filter(Boolean).join(" ") ||
     "Property";
-  const { isFavorite, toggleFavorite } = useGlobalContext();
+  const { isFavorite, toggleFavorite, theme } = useGlobalContext();
   const isItemFavorite = item?.id ? isFavorite(item.id) : false;
+  const isDark = theme === "dark";
   const handleFavoritePress = useCallback(
     (event: GestureResponderEvent) => {
       event.stopPropagation?.();
@@ -126,10 +140,14 @@ const RegularCardComponent = ({ item, onPress }: Props) => {
   return (
     <TouchableOpacity
       onPress={handlePress}
-      className="flex-1 w-full mt-4 px-3 py-4 rounded-lg bg-white shadow-lg shadow-black-100/70 relative"
+      className="flex-1 w-full mt-4 px-3 py-4 rounded-lg bg-white dark:bg-slate-900 shadow-lg shadow-black-100/70 dark:shadow-black/40 relative"
     >
-      <View className="flex flex-row items-center absolute px-2 top-5 right-5 bg-white/90 p-1 rounded-full z-50">
-        <Image source={icons.view} className="size-2.5" />
+      <View className="flex flex-row items-center absolute px-2 top-5 right-5 bg-white/90 dark:bg-slate-900/80 p-1 rounded-full z-50">
+        <Image
+          source={icons.view}
+          className="size-2.5"
+          style={isDark ? { tintColor: "#CBD5F5" } : undefined}
+        />
         <Text className="text-xs font-rubik-bold text-primary-300 ml-0.5">
           {(item.views ?? 0).toLocaleString()}
         </Text>
@@ -142,10 +160,10 @@ const RegularCardComponent = ({ item, onPress }: Props) => {
       )}
 
       <View className="flex flex-col mt-2">
-        <Text className="text-base font-rubik-bold text-black-300" numberOfLines={1}>
+        <Text className="text-base font-rubik-bold text-black-300 dark:text-slate-100" numberOfLines={1}>
           {title}
         </Text>
-        <Text className="text-xs font-rubik text-black-200" numberOfLines={2}>
+        <Text className="text-xs font-rubik text-black-200 dark:text-slate-400" numberOfLines={2}>
           {buildSubtitle(item)}
         </Text>
         <View className="flex flex-row items-center justify-between mt-2">
@@ -153,7 +171,9 @@ const RegularCardComponent = ({ item, onPress }: Props) => {
             {item.rate}
           </Text>
           <TouchableOpacity onPress={handleFavoritePress} activeOpacity={0.8}>
-            <FavoriteIcon tintColor={isItemFavorite ? "#F75555" : "#191d31"} />
+            <FavoriteIcon
+              tintColor={isItemFavorite ? "#F75555" : isDark ? "#E2E8F0" : "#191d31"}
+            />
           </TouchableOpacity>
         </View>
       </View>

@@ -16,7 +16,6 @@ import { router, useLocalSearchParams } from "expo-router";
 
 import icons from "@/constants/icons";
 import images from "@/constants/images";
-import Comment from "@/components/Comment";
 
 import { useMemo, useCallback } from "react";
 import { getProperties, useCRMRE, Property } from "@/lib/crmre";
@@ -30,7 +29,8 @@ const PropertyDetails = () => {
   const { id } = useLocalSearchParams<{ id?: string }>();
   const windowHeight = Dimensions.get("window").height;
   const insets = useSafeAreaInsets();
-  const { toggleFavorite, isFavorite } = useGlobalContext();
+  const { toggleFavorite, isFavorite, theme } = useGlobalContext();
+  const isDark = theme === "dark";
 
   const params = useMemo(() => ({ id: Number(id) }), [id]);
 
@@ -94,15 +94,18 @@ const PropertyDetails = () => {
 
   if (loading) {
     return (
-      <View className="flex-1 justify-center items-center">
-        <ActivityIndicator size="large" color="#0000ff" />
+      <View className="flex-1 justify-center items-center bg-white dark:bg-slate-950">
+        <ActivityIndicator
+          size="large"
+          color={isDark ? "#93C5FD" : "#0061FF"}
+        />
       </View>
     );
   }
 
   if (error || !property) {
     return (
-      <View className="flex-1 justify-center items-center">
+      <View className="flex-1 justify-center items-center bg-white dark:bg-slate-950">
         <Text className="text-red-500">Failed to load property details.</Text>
         <TouchableOpacity onPress={() => router.back()}>
           <Text className="text-blue-500 mt-5">Go Back</Text>
@@ -154,7 +157,7 @@ const PropertyDetails = () => {
     <View>
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerClassName="pb-32 bg-white"
+        contentContainerClassName="pb-32 bg-white dark:bg-slate-950"
       >
         <View className="relative w-full" style={{ height: windowHeight / 2 }}>
 
@@ -218,50 +221,54 @@ const PropertyDetails = () => {
         </View>
 
         <View className="px-5 mt-7 flex gap-2">
-          <Text className="text-2xl font-rubik-extrabold">
+          <Text className="text-2xl font-rubik-extrabold text-black-300 dark:text-slate-100">
             {[propertyHeading, property?.property?.name || property?.name]
               .filter(Boolean)
               .join(" - ")}
           </Text>
 
           <View className="flex flex-row items-center gap-3">
-            <View className="flex flex-row items-center px-4 py-2 bg-primary-100 rounded-full">
+            <View className="flex flex-row items-center px-4 py-2 bg-primary-100 dark:bg-primary-300/20 rounded-full">
               <Text className="text-xs font-rubik-bold text-primary-300">
                 {property?.type}
               </Text>
             </View>
 
             <View className="flex flex-row items-center gap-2">
-              <Image source={icons.star} className="size-5" />
-              <Text className="text-black-200 text-sm mt-1 font-rubik-medium">
+              <Image
+                source={icons.star}
+                className="size-5"
+                style={isDark ? { tintColor: "#FBBF24" } : undefined}
+              />
+              <Text className="text-black-200 dark:text-slate-400 text-sm mt-1 font-rubik-medium">
                 5 (9 reviews)
               </Text>
             </View>
           </View>
 
           <View className="flex flex-row items-center mt-5">
-            <View className="flex flex-row items-center justify-center bg-primary-100 rounded-full size-10">
+            <View className="flex flex-row items-center justify-center bg-primary-100 dark:bg-primary-300/20 rounded-full size-10">
               <Image source={icons.bed} className="size-4" />
             </View>
-            <Text className="text-black-300 text-sm font-rubik-medium ml-2">
+            <Text className="text-black-300 dark:text-slate-100 text-sm font-rubik-medium ml-2">
               {property?.bedrooms ?? "—"} Beds
             </Text>
-            <View className="flex flex-row items-center justify-center bg-primary-100 rounded-full size-10 ml-7">
+            <View className="flex flex-row items-center justify-center bg-primary-100 dark:bg-primary-300/20 rounded-full size-10 ml-7">
               <Image source={icons.bath} className="size-4" />
             </View>
-            <Text className="text-black-300 text-sm font-rubik-medium ml-2">
+            <Text className="text-black-300 dark:text-slate-100 text-sm font-rubik-medium ml-2">
               {property?.bathrooms ?? "—"} Baths
             </Text>
-            <View className="flex flex-row items-center justify-center bg-primary-100 rounded-full size-10 ml-7">
+            <View className="flex flex-row items-center justify-center bg-primary-100 dark:bg-primary-300/20 rounded-full size-10 ml-7">
               <Image source={icons.area} className="size-4" />
             </View>
-            <Text className="text-black-300 text-sm font-rubik-medium ml-2">
+            <Text className="text-black-300 dark:text-slate-100 text-sm font-rubik-medium ml-2">
               {property?.area ?? "—"} Sqm
             </Text>
           </View>
 
-          <View className="w-full border-t border-primary-200 pt-7 mt-5">
-            <Text className="text-black-300 text-xl font-rubik-bold">
+          <View className="w-full border-t border-primary-200 dark:border-slate-800 pt-7 mt-5">
+            <Text className="text-black-300 dark:text-slate-100 text-xl font-rubik-bold">
               Agent
             </Text>
 
@@ -279,7 +286,7 @@ const PropertyDetails = () => {
                   </View>
 
                   <View className="flex flex-col items-start justify-center ml-3">
-                    <Text className="text-lg text-black-300 text-start font-rubik-bold">
+                    <Text className="text-lg text-black-300 dark:text-slate-100 text-start font-rubik-bold">
                       {agent.name}
                     </Text>
                     {agent.email ? (
@@ -292,7 +299,7 @@ const PropertyDetails = () => {
                           )
                         }
                       >
-                        <Text className="text-sm text-black-200 text-start font-rubik-medium">
+                        <Text className="text-sm text-black-200 dark:text-slate-400 text-start font-rubik-medium">
                           {agent.email}
                         </Text>
                       </TouchableOpacity>
@@ -323,23 +330,23 @@ const PropertyDetails = () => {
                 </View>
               </View>
             ) : (
-              <Text className="text-black-200 text-sm font-rubik mt-4">
+              <Text className="text-black-200 dark:text-slate-400 text-sm font-rubik mt-4">
                 Agent details are not available for this unit.
               </Text>
             )}
           </View>
 
           <View className="mt-7">
-            <Text className="text-black-300 text-xl font-rubik-bold">
+            <Text className="text-black-300 dark:text-slate-100 text-xl font-rubik-bold">
               Overview
             </Text>
-            <Text className="text-black-200 text-base font-rubik mt-2">
+            <Text className="text-black-200 dark:text-slate-400 text-base font-rubik mt-2">
               {propertyDescription || "No description available"}
             </Text>
           </View>
 
           <View className="mt-7">
-            <Text className="text-black-300 text-xl font-rubik-bold">
+            <Text className="text-black-300 dark:text-slate-100 text-xl font-rubik-bold">
               Facilities
             </Text>
 
@@ -355,11 +362,11 @@ const PropertyDetails = () => {
                       key={`${item.identifier ?? "facility"}-${index}`}
                       className="flex flex-1 flex-col items-center min-w-16 max-w-20"
                     >
-                      <View className="size-14 bg-primary-100 rounded-full flex items-center justify-center">
+                      <View className="size-14 bg-primary-100 dark:bg-primary-300/20 rounded-full flex items-center justify-center">
                         <Image source={iconSource} className="size-6" />
                       </View>
 
-                      <Text className="text-black-300 text-sm text-center font-rubik mt-1.5">
+                      <Text className="text-black-300 dark:text-slate-100 text-sm text-center font-rubik mt-1.5">
                         {item.facility}
                       </Text>
                     </View>
@@ -375,12 +382,16 @@ const PropertyDetails = () => {
           )}
 
           <View className="mt-7">
-            <Text className="text-black-300 text-xl font-rubik-bold">
+            <Text className="text-black-300 dark:text-slate-100 text-xl font-rubik-bold">
               Location
             </Text>
             <View className="flex flex-row items-center justify-start mt-4 gap-2">
-              <Image source={icons.location} className="w-7 h-7" />
-              <Text className="text-black-200 text-sm font-rubik-medium">
+              <Image
+                source={icons.location}
+                className="w-7 h-7"
+                style={isDark ? { tintColor: "#CBD5F5" } : undefined}
+              />
+              <Text className="text-black-200 dark:text-slate-400 text-sm font-rubik-medium">
                 {property?.address ||
                   [property?.city, property?.country].filter(Boolean).join(", ")}
               </Text>
@@ -420,10 +431,10 @@ const PropertyDetails = () => {
         </View>
       </ScrollView>
 
-      <View className="absolute bg-white bottom-0 w-full rounded-t-2xl border-t border-r border-l border-primary-200 p-7">
+      <View className="absolute bg-white dark:bg-slate-950 bottom-0 w-full rounded-t-2xl border-t border-r border-l border-primary-200 dark:border-slate-800 p-7 shadow-2xl shadow-black/40">
         <View className="flex flex-row items-center justify-between gap-10">
           <View className="flex flex-col items-start">
-            <Text className="text-black-200 text-xs font-rubik-medium">
+            <Text className="text-black-200 dark:text-slate-400 text-xs font-rubik-medium">
               Price
             </Text>
             <Text
@@ -435,7 +446,7 @@ const PropertyDetails = () => {
           </View>
 
           <TouchableOpacity
-            className="flex-1 flex flex-row items-center justify-center bg-primary-300 py-3 rounded-full shadow-md shadow-zinc-400"
+            className="flex-1 flex flex-row items-center justify-center bg-primary-300 py-3 rounded-full shadow-md shadow-zinc-400 dark:shadow-black/60"
             onPress={() => {
               if (property?.application_url) {
                 Linking.openURL(property.application_url);

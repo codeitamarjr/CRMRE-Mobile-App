@@ -1,5 +1,5 @@
 import { ActivityIndicator, FlatList, Image, Text, TouchableOpacity, View } from "react-native";
-import { router, useLocalSearchParams } from "expo-router";
+import { router } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import icons from "@/constants/icons";
 import Search from "@/components/Search";
@@ -10,9 +10,10 @@ import { useCRMRE, getProperties, Property } from "@/lib/crmre";
 import NoResults from "@/components/NoResults";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import FiltersBottomSheet from "@/components/FiltersBottomSheet";
+import ThemeToggle from "@/components/ThemeToggle";
 
 export default function Index() {
-  const { user } = useGlobalContext();
+  const { user, theme } = useGlobalContext();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedFilter, setSelectedFilter] = useState("All");
   const [page, setPage] = useState(1);
@@ -25,7 +26,6 @@ export default function Index() {
     maxPrice?: string;
   }>({ bedrooms: [] });
 
-  const params = useLocalSearchParams<{ query?: string }>();
   const PER_PAGE = 20;
 
   const apiFilters = useMemo(() => {
@@ -177,7 +177,7 @@ export default function Index() {
         console.error("Property ID is undefined");
       }
     },
-    [router]
+    []
   );
 
   const renderProperty = useCallback(
@@ -239,7 +239,7 @@ export default function Index() {
 
   return (
     <View
-      className="bg-white h-full"
+      className="bg-white dark:bg-slate-950 h-full"
       style={{
         paddingTop: insets.top,
         paddingBottom: insets.bottom,
@@ -261,7 +261,11 @@ export default function Index() {
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={
           allProperties ? (
-            <ActivityIndicator size="large" className="text-primary-300 mt-5" />
+            <ActivityIndicator
+              size="large"
+              color={theme === "dark" ? "#93C5FD" : "#0061FF"}
+              style={{ marginTop: 20 }}
+            />
           ) : <NoResults />
         }
         ListHeaderComponent={
@@ -270,11 +274,22 @@ export default function Index() {
               <View className="flex flex-row items-center">
                 <Image source={{ uri: user?.avatar }} className="size-12 rounded-full" />
                 <View className="flex flex-col items-start ml-2 justify-center">
-                  <Text className="text-xs font-rubik text-black-100">{greeting},</Text>
-                  <Text className="text-base font-rubik-medium text-black-300">{user?.name}</Text>
+                  <Text className="text-xs font-rubik text-black-100 dark:text-slate-400">
+                    {greeting},
+                  </Text>
+                  <Text className="text-base font-rubik-medium text-black-300 dark:text-slate-100">
+                    {user?.name}
+                  </Text>
                 </View>
               </View>
-              <Image source={icons.bell} className="size-6" />
+              <View className="flex flex-row items-center gap-3">
+                <ThemeToggle />
+                <Image
+                  source={icons.bell}
+                  className="size-6"
+                  style={theme === "dark" ? { tintColor: "#E2E8F0" } : undefined}
+                />
+              </View>
             </View>
 
             <Search onSearch={handleSearch} onFilterPress={handleFilterPress} />
@@ -283,7 +298,7 @@ export default function Index() {
             {!searchTerm && (
               <View className="mt-5">
                 <View className="flex flex-row items-center justify-between">
-                  <Text className="text-xl font-rubik-bold text-black-300">
+                  <Text className="text-xl font-rubik-bold text-black-300 dark:text-slate-100">
                     Featured
                   </Text>
                   <TouchableOpacity>
@@ -294,7 +309,10 @@ export default function Index() {
                 </View>
 
                 {featuredLoading ? (
-                  <ActivityIndicator size="large" className="text-primary-300" />
+                  <ActivityIndicator
+                    size="large"
+                    color={theme === "dark" ? "#93C5FD" : "#0061FF"}
+                  />
                 ) : !Array.isArray(featuredProperties) || featuredProperties.length === 0 ? (
                   <NoResults />
                 ) : (
@@ -313,7 +331,7 @@ export default function Index() {
             )}
 
             <View className="mt-5 flex flex-row items-center justify-between">
-              <Text className="text-xl font-rubik-bold text-black-300">
+              <Text className="text-xl font-rubik-bold text-black-300 dark:text-slate-100">
                 Our Recommendation
               </Text>
               <TouchableOpacity>
@@ -332,7 +350,11 @@ export default function Index() {
         onEndReachedThreshold={0.4}
         ListFooterComponent={
           page > 1 && allProperties ? (
-            <ActivityIndicator size="large" className="mt-4" />
+            <ActivityIndicator
+              size="large"
+              color={theme === "dark" ? "#93C5FD" : "#0061FF"}
+              style={{ marginTop: 16 }}
+            />
           ) : null
         }
       />

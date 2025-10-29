@@ -19,12 +19,12 @@ const Comment = ({ item }: Props) => {
     <View className="flex flex-col items-start">
       <View className="flex flex-row items-center">
         <Image source={{ uri: item.avatar }} className="size-14 rounded-full" />
-        <Text className="text-base text-black-300 text-start font-rubik-bold ml-3">
+        <Text className="text-base text-black-300 dark:text-slate-100 text-start font-rubik-bold ml-3">
           {item.name}
         </Text>
       </View>
 
-      <Text className="text-black-200 text-base font-rubik mt-2">
+      <Text className="text-black-200 dark:text-slate-400 text-base font-rubik mt-2">
         {item.review}
       </Text>
 
@@ -35,11 +35,11 @@ const Comment = ({ item }: Props) => {
             className="size-5"
             tintColor={"#0061FF"}
           />
-          <Text className="text-black-300 text-sm font-rubik-medium ml-2">
+          <Text className="text-black-300 dark:text-slate-100 text-sm font-rubik-medium ml-2">
             {(item.likes ?? 0).toLocaleString()}
           </Text>
         </View>
-        <Text className="text-black-100 text-sm font-rubik">
+        <Text className="text-black-100 dark:text-slate-500 text-sm font-rubik">
           {new Date(item.createdAt).toDateString()}
         </Text>
       </View>

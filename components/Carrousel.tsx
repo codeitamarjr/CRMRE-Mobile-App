@@ -33,7 +33,7 @@ const Carrousel = ({ images }: { images: string[] }) => {
         {images.map((_, index) => (
           <View
             key={index}
-            className={`w-2.5 h-2.5 rounded-full mx-1 ${index === currentIndex ? "bg-blue-500" : "bg-white"
+            className={`w-2.5 h-2.5 rounded-full mx-1 ${index === currentIndex ? "bg-blue-500" : "bg-white dark:bg-slate-700"
               }`}
           />
         ))}

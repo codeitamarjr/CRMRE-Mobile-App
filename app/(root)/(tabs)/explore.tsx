@@ -1,5 +1,5 @@
 import { ActivityIndicator, FlatList, Image, Text, TouchableOpacity, View } from "react-native";
-import { router, useLocalSearchParams } from "expo-router";
+import { router } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import icons from "@/constants/icons";
 import Search from "@/components/Search";
@@ -9,8 +9,11 @@ import { useCRMRE, getProperties, Property } from "@/lib/crmre";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import NoResults from "@/components/NoResults";
 import FiltersBottomSheet from "@/components/FiltersBottomSheet";
+import ThemeToggle from "@/components/ThemeToggle";
+import { useGlobalContext } from "@/lib/global-provide";
 
 export default function Explore() {
+  const { theme } = useGlobalContext();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedFilter, setSelectedFilter] = useState("All");
   const [page, setPage] = useState(1);
@@ -23,7 +26,6 @@ export default function Explore() {
     maxPrice?: string;
   }>({ bedrooms: [] });
 
-  const params = useLocalSearchParams<{ query?: string }>();
   const PER_PAGE = 20;
 
   const apiFilters = useMemo(() => {
@@ -162,7 +164,7 @@ export default function Explore() {
         console.error("Property ID is undefined");
       }
     },
-    [router]
+    []
   );
 
   const renderProperty = useCallback(
@@ -211,7 +213,7 @@ export default function Explore() {
 
   return (
     <View
-      className="bg-white h-full"
+      className="bg-white dark:bg-slate-950 h-full"
       style={{
         paddingTop: insets.top,
         paddingBottom: insets.bottom,
@@ -233,7 +235,11 @@ export default function Explore() {
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={
           allProperties ? (
-            <ActivityIndicator size="large" className="text-primary-300 mt-5" />
+            <ActivityIndicator
+              size="large"
+              color={theme === "dark" ? "#93C5FD" : "#0061FF"}
+              style={{ marginTop: 20 }}
+            />
           ) : <NoResults />
         }
         ListHeaderComponent={
@@ -241,16 +247,23 @@ export default function Explore() {
             <View className="flex flex-row items-center justify-between mt-5">
 
               <TouchableOpacity onPress={() => router.back()} className="flex flex-row size-12">
-                <View className="size-11 justify-center items-center bg-primary-200 rounded-full">
+                <View className="size-11 justify-center items-center bg-primary-200 dark:bg-primary-300/40 rounded-full">
                   <Image source={icons.backArrow} className="size-5" />
                 </View>
               </TouchableOpacity>
 
-              <Text className="text-base mr-2 text-center font-rubik-medium text-black-300">
+              <Text className="text-base mr-2 text-center font-rubik-medium text-black-300 dark:text-slate-100">
                 Search for Your Ideal Home
               </Text>
 
-              <Image source={icons.bell} className="size-6" />
+              <View className="flex flex-row items-center gap-3">
+                <ThemeToggle />
+                <Image
+                  source={icons.bell}
+                  className="size-6"
+                  style={theme === "dark" ? { tintColor: "#E2E8F0" } : undefined}
+                />
+              </View>
 
             </View>
 
@@ -260,7 +273,7 @@ export default function Explore() {
 
               <Filters onFilterChange={handleFilterChange} />
 
-              <Text className="text-xl font-rubik-bold text-black-300 mt-5">
+              <Text className="text-xl font-rubik-bold text-black-300 dark:text-slate-100 mt-5">
                 Found {filteredProperties.length} properties
               </Text>
             </View>
@@ -270,7 +283,11 @@ export default function Explore() {
         onEndReachedThreshold={0.4}
         ListFooterComponent={
           page > 1 && allProperties ? (
-            <ActivityIndicator size="large" className="mt-4" />
+            <ActivityIndicator
+              size="large"
+              color={theme === "dark" ? "#93C5FD" : "#0061FF"}
+              style={{ marginTop: 16 }}
+            />
           ) : null
         }
       />

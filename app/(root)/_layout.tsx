@@ -4,13 +4,13 @@ import { ActivityIndicator, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function AppLayout() {
-    const { loading, isLoggedIn } = useGlobalContext();
+    const { loading, isLoggedIn, theme } = useGlobalContext();
     const insets = useSafeAreaInsets();
 
     if (loading) {
         return (
             <View
-                className="bg-white h-full flex justify-center items-center"
+                className="bg-white dark:bg-slate-950 h-full flex justify-center items-center"
                 style={{
                     paddingTop: insets.top,
                     paddingBottom: insets.bottom,
@@ -18,7 +18,10 @@ export default function AppLayout() {
                     paddingRight: insets.right,
                 }}
             >
-                <ActivityIndicator className="text-primary-300" size="large" />
+                <ActivityIndicator
+                    size="large"
+                    color={theme === "dark" ? "#93C5FD" : "#0061FF"}
+                />
             </View>
         )
     }

@@ -7,6 +7,8 @@ import {
     useEffect,
 } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Appearance } from "react-native";
+import { colorScheme } from "nativewind";
 import { Property } from "@/lib/crmre";
 
 interface User {
@@ -25,10 +27,16 @@ interface GlobalContextType {
     favorites: Property[];
     toggleFavorite: (property: Property) => void;
     isFavorite: (propertyId: number) => boolean;
+    theme: Theme;
+    setTheme: (theme: Theme) => void;
+    toggleTheme: () => void;
 }
+
+type Theme = "light" | "dark";
 
 const GlobalContext = createContext<GlobalContextType | undefined>(undefined);
 const FAVORITES_STORAGE_KEY = "crmre:favorites";
+const THEME_STORAGE_KEY = "crmre:theme";
 
 export const GlobalProvider = ({ children }: { children: ReactNode }) => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -36,6 +44,11 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
     const [loading, setLoading] = useState(false);
     const [favorites, setFavorites] = useState<Property[]>([]);
     const [favoritesHydrated, setFavoritesHydrated] = useState(false);
+    const systemTheme = Appearance.getColorScheme();
+    const [theme, setThemeState] = useState<Theme>(
+        systemTheme === "dark" ? "dark" : "light"
+    );
+    const [themeHydrated, setThemeHydrated] = useState(false);
 
     const login = useCallback(async () => {
         setLoading(true);
@@ -67,6 +80,14 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
         [favorites]
     );
 
+    const setTheme = useCallback((nextTheme: Theme) => {
+        setThemeState(nextTheme);
+    }, []);
+
+    const toggleTheme = useCallback(() => {
+        setThemeState((prev) => (prev === "light" ? "dark" : "light"));
+    }, []);
+
     useEffect(() => {
         const loadFavorites = async () => {
             try {
@@ -88,6 +109,23 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
     }, []);
 
     useEffect(() => {
+        const loadThemePreference = async () => {
+            try {
+                const storedTheme = await AsyncStorage.getItem(THEME_STORAGE_KEY);
+                if (storedTheme === "light" || storedTheme === "dark") {
+                    setThemeState(storedTheme);
+                }
+            } catch (error) {
+                console.warn("Failed to load theme preference", error);
+            } finally {
+                setThemeHydrated(true);
+            }
+        };
+
+        loadThemePreference();
+    }, []);
+
+    useEffect(() => {
         if (!favoritesHydrated) return;
 
         const persistFavorites = async () => {
@@ -104,6 +142,26 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
         persistFavorites();
     }, [favorites, favoritesHydrated]);
 
+    useEffect(() => {
+        if (!themeHydrated) return;
+
+        try {
+            colorScheme?.set?.(theme);
+        } catch (error) {
+            console.warn("Failed to set theme for NativeWind", error);
+        }
+
+        const persistTheme = async () => {
+            try {
+                await AsyncStorage.setItem(THEME_STORAGE_KEY, theme);
+            } catch (error) {
+                console.warn("Failed to save theme preference", error);
+            }
+        };
+
+        persistTheme();
+    }, [theme, themeHydrated]);
+
     return (
         <GlobalContext.Provider
             value={{
@@ -115,6 +173,9 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
                 favorites,
                 toggleFavorite,
                 isFavorite,
+                theme,
+                setTheme,
+                toggleTheme,
             }}
         >
             {children}
