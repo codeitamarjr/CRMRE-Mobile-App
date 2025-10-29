@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useContext } from "react";
+import { createContext, ReactNode, useContext, useState, useCallback } from "react";
 
 interface User {
     $id: string;
@@ -11,19 +11,29 @@ interface GlobalContextType {
     isLoggedIn: boolean;
     user: User | null;
     loading: boolean;
-    refetch: () => Promise<void>; // noop
+    refetch: () => Promise<void>;
+    login: () => Promise<void>;
 }
 
 const GlobalContext = createContext<GlobalContextType | undefined>(undefined);
 
 export const GlobalProvider = ({ children }: { children: ReactNode }) => {
-    const isLoggedIn = true;
-    const user = null;
-    const loading = false;
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [user] = useState<User | null>(null);
+    const [loading, setLoading] = useState(false);
 
-    const refetch = async () => {
-        // no-op (placeholder for future login logic or refresh)
-    };
+    const login = useCallback(async () => {
+        setLoading(true);
+        try {
+            setIsLoggedIn(true);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    const refetch = useCallback(async () => {
+        // Placeholder for future refresh logic
+    }, []);
 
     return (
         <GlobalContext.Provider
@@ -31,7 +41,8 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
                 isLoggedIn,
                 user,
                 loading,
-                refetch
+                refetch,
+                login,
             }}
         >
             {children}
