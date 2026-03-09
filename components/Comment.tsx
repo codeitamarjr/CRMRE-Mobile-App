@@ -1,11 +1,14 @@
 import { View, Text, Image } from "react-native";
 
-import images from "@/constants/images";
 import icons from "@/constants/icons";
-import { Models } from "react-native-appwrite";
 
 interface Props {
-  item: Models.Document;
+  item: {
+    avatar: string;
+    name: string;
+    review: string;
+    $createdAt: string;
+  };
 }
 
 const Comment = ({ item }: Props) => {

@@ -1,10 +1,11 @@
 import { Alert } from "react-native";
 import { useEffect, useState, useCallback } from "react";
 
-interface UseAppwriteOptions<T, P extends Record<string, string | number>> {
+interface UseAppwriteOptions<T, P extends Record<string, string | number | boolean>> {
     fn: (params: P) => Promise<T>;
     params?: P;
     skip?: boolean;
+    initialData?: T | null;
 }
 
 interface UseAppwriteReturn<T, P> {
@@ -14,13 +15,15 @@ interface UseAppwriteReturn<T, P> {
     refetch: (newParams: P) => Promise<void>;
 }
 
-export const useAppwrite = <T, P extends Record<string, string | number>>({
+export const useApiQuery = <T, P extends Record<string, string | number | boolean>>({
     fn,
     params = {} as P,
     skip = false,
+    initialData,
 }: UseAppwriteOptions<T, P>): UseAppwriteReturn<T, P> => {
-    const [data, setData] = useState<T | null>(null);
-    const [loading, setLoading] = useState(!skip);
+    const hasInitialData = initialData !== undefined;
+    const [data, setData] = useState<T | null>(hasInitialData ? (initialData as T | null) : null);
+    const [loading, setLoading] = useState(!skip && !hasInitialData);
     const [error, setError] = useState<string | null>(null);
 
     const fetchData = useCallback(
@@ -44,7 +47,7 @@ export const useAppwrite = <T, P extends Record<string, string | number>>({
     );
 
     useEffect(() => {
-        if (!skip) {
+        if (!skip && !hasInitialData) {
             fetchData(params);
         }
     }, []);

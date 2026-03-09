@@ -1,31 +1,30 @@
-import { View, Text, Image } from 'react-native'
+import { View, Image } from 'react-native'
 import React from 'react'
 import { Tabs } from 'expo-router'
 
 import icons from '@/constants/icons'
+import { useGlobalContext } from '@/lib/global-provide'
 
-const TabIcon = ({ focused, icon, title }: {
+const TabIcon = ({ focused, icon }: {
     focused: boolean,
     icon: any,
-    title: string
 }) => (
     <View className='flex flex-col flex-1 mt-2 items-center'>
         <Image source={icon} tintColor={focused ? '#0061FF' : '#666876'} resizeMode='contain' className='size-6' />
-        <Text className='{focused ? "text-primary-300 font-rubik-medium" : "text-gray-500 font-rubik"} text-sm w-full text-center mt-1'>
-            {title}
-        </Text>
     </View>
 )
 
 function TabsLayout() {
+    const { isDarkTheme } = useGlobalContext();
+
     return (
         <Tabs
             screenOptions={{
                 tabBarShowLabel: false,
                 tabBarStyle: {
-                    backgroundColor: 'white',
+                    backgroundColor: isDarkTheme ? '#111827' : 'white',
                     position: 'absolute',
-                    borderTopColor: '#0061FF1A',
+                    borderTopColor: isDarkTheme ? '#1F2937' : '#0061FF1A',
                     borderTopWidth: 1,
                     minHeight: 70,
                 },
@@ -40,7 +39,6 @@ function TabsLayout() {
                         <TabIcon
                             icon={icons.home}
                             focused={focused}
-                            title="Home"
                         />
                     )
                 }} />
@@ -53,7 +51,18 @@ function TabsLayout() {
                         <TabIcon
                             icon={icons.search}
                             focused={focused}
-                            title="Explore"
+                        />
+                    )
+                }} />
+                <Tabs.Screen
+                name="favorites"
+                options={{
+                    title: 'Favorites',
+                    headerShown: false,
+                    tabBarIcon: ({ focused }) => (
+                        <TabIcon
+                            icon={icons.heart}
+                            focused={focused}
                         />
                     )
                 }} />
@@ -66,7 +75,6 @@ function TabsLayout() {
                         <TabIcon
                             icon={icons.person}
                             focused={focused}
-                            title="Profile"
                         />
                     )
                 }} />

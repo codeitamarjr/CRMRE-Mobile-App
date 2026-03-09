@@ -32,6 +32,9 @@ import wifi from "@/assets/icons/wifi.png";
 import location from "@/assets/icons/location.png";
 import edit from "@/assets/icons/edit.png";
 
+const petFriendly = dog;
+const freeWifi = wifi;
+
 export default {
   google,
   home,
@@ -59,11 +62,13 @@ export default {
   carPark,
   cutlery,
   dog,
+  petFriendly,
   dumbell,
   laundry,
   run,
   swim,
   wifi,
+  freeWifi,
   location,
   edit,
 };
